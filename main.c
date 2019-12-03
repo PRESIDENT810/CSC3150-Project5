@@ -88,6 +88,13 @@ struct DataIn {
 // Arithmetic funciton
 static void drv_arithmetic_routine(struct work_struct* ws);
 
+//irq_handler_t handler;
+int interrupt_cnt = 0;
+static irqreturn_t  mydev_interrupt(int irq, void *dev_id){
+    interrupt_cnt++;
+    myouti(1, DMAIRQOKADDR);
+    return IRQ_HANDLED;
+}
 
 // Input and output data from/to DMA
 void myoutc(unsigned char data,unsigned short int port) {
@@ -160,6 +167,8 @@ static ssize_t drv_read(struct file *filp, char __user *buffer, size_t ss, loff_
 
     put_user(ans, (int *) buffer);
 
+    myouti(1, DMARWOKADDR);
+
 	return 0;
 }
 
@@ -195,6 +204,8 @@ static ssize_t drv_write(struct file *filp, const char __user *buffer, size_t ss
         printk("%s:%s(): queue work\n", PREFIX_TITLE, __func__);
         schedule_work(work);
     }
+
+    myouti(1, DMARWOKADDR);
 
 	return 0;
 }
@@ -239,6 +250,7 @@ static long drv_ioctl(struct file *filp, unsigned int cmd, unsigned long arg) {
         put_user(1, (int *) arg);
 	}
 
+    myouti(1, DMAIOCOKADDR);
 	return 0;
 }
 
@@ -319,7 +331,9 @@ static int __init init_modules(void) {
     printk("%s:%s():allocate work routine\n", PREFIX_TITLE, __func__);
 
 
-    printk("%s:%s():...............Start...............\n", PREFIX_TITLE, __func__);
+    /* Bonus part*/
+    int ret = request_irq(1, mydev_interrupt, IRQF_SHARED, "BonusDev", (void *) &dev_cdev);
+    printk("%s:%s: request_irq %d return %d\n", PREFIX_TITLE, __func__, 1, ret);
 
 
 	return 0;
@@ -345,6 +359,10 @@ static void __exit exit_modules(void) {
     kfree(work);
     printk("%s:%s(): unregister chrdev\n", PREFIX_TITLE, __func__);
     printk("%s:%s():..............End..............\n", PREFIX_TITLE, __func__);
+
+    /* BonusPart */
+    free_irq(1, (void *) &dev_cdev);
+    printk("%s:%s():interrupt count = %d\n", PREFIX_TITLE, __func__, interrupt_cnt);
 
 }
 
