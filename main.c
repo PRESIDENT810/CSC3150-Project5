@@ -232,7 +232,7 @@ static long drv_ioctl(struct file *filp, unsigned int cmd, unsigned long arg) {
 
 	else if (cmd == HW5_IOCSETIRQOK){ // Set if IRQ OK: printk OK if you complete bonus
         myouti(value, DMAIRQOKADDR);
-//        printk("%s:%s(): IRQ OK\n", PREFIX_TITLE, __func__);
+        printk("%s:%s(): IRQ OK\n", PREFIX_TITLE, __func__);
 	}
 
 	else if (cmd == HW5_IOCSETBLOCK){ // Set blocking or non-blocking: set write function mode

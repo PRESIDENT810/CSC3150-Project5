@@ -145,11 +145,11 @@ int main()
         return -1;
     }
 
-//    ret = 1;
-//    if (ioctl(fd, HW5_IOCSETIRQOK, &ret) < 0) {
-//        printf("set irq failed\n");
-//        return -1;
-//    }
+    ret = 1;
+    if (ioctl(fd, HW5_IOCSETIRQOK, &ret) < 0) {
+        printf("set irq failed\n");
+        return -1;
+    }
 
 //    arithmetic(fd, '+', 100, 10);
 //    arithmetic(fd, '-', 100, 10);
